@@ -1,0 +1,27 @@
+{
+    "version": 2,
+    "name": "sanbanfu2",
+    "rewrites": [
+        {
+            "source": "/paipan",
+            "destination": "/paipan.html"
+        },
+        {
+            "source": "/",
+            "destination": "/paipan.html"
+        },
+        {
+            "source": "/js/(.*)",
+            "destination": "/js/$1"
+        },
+        {
+            "source": "/css/(.*)",
+            "destination": "/css/$1"
+        },
+        {
+            "source": "/assets/(.*)",
+            "destination": "/assets/$1"
+        }
+    ],
+    "cleanUrls": true
+}
