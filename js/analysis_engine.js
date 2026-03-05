@@ -541,7 +541,7 @@ window.AnalysisEngine = (function () {
             const nodeIdx = (pos.pIdx * 2) + (pos.type === 'gan' ? 0 : 1);
             const mainNode = ctx.getGodByIndex(nodeIdx);
 
-            if (!mainNode) return null;
+            if (!mainNode || !mainNode.char) return null;
 
             // 1. Calculate YueLing Status
             let yueLingStatus = null;
@@ -580,10 +580,10 @@ window.AnalysisEngine = (function () {
             const samePillarStem = ctx.gods[pos.pIdx * 2];
             const samePillarBranch = ctx.gods[pos.pIdx * 2 + 1];
 
-            if (samePillarStem && samePillarBranch) {
+            if (samePillarStem && samePillarBranch && samePillarStem.wx && samePillarBranch.wx) {
                 const sWX = samePillarStem.wx;
                 const bWX = samePillarBranch.wx;
-                const rel = WX_RELATION[sWX][bWX];
+                const rel = WX_RELATION[sWX] ? WX_RELATION[sWX][bWX] : null;
 
                 if (pos.type === 'gan' && WX_RELATION[bWX][sWX] === '克') {
                     resDetails.push(`截脚 (${samePillarBranch.char}克${samePillarStem.char})`);
