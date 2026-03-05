@@ -14,7 +14,7 @@
     <meta name="apple-mobile-web-app-title" content="三板斧">
     <link rel="apple-touch-icon" href="assets/icon.png">
 
-    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/style.css?v=20260305-v1">
     <style>
         /* Tree Viewer Styles */
         .tree-select {
@@ -187,35 +187,57 @@
 
 <body>
     <script>
-        // Nuclear Cache Clearing - Break ALL PWA caches for the entire domain
-        async function clearEverything() {
-            // Service Worker and Caches API are not supported on file:// protocol
+        // === CORE CACHE BUSTER - FORCE PWA UPDATE ===
+        // Version for current deployment
+        const DEPLOY_VERSION = '20260305-v1';
+
+        async function forceUpdate() {
+            console.log('--- Force Update Check: ' + DEPLOY_VERSION + ' ---');
+
+            // 1. Basic Protocol Check
             if (window.location.protocol !== 'http:' && window.location.protocol !== 'https:') {
-                console.log('Local filesystem detected, skipping SW/Cache cleanup.');
                 return;
             }
-            try {
-                if ('serviceWorker' in navigator) {
-                    const registrations = await navigator.serviceWorker.getRegistrations();
-                    for (let registration of registrations) {
-                        await registration.unregister();
-                        console.log('SW unregistered:', registration.scope);
+
+            // 2. Version Check & Trigger
+            if (localStorage.getItem('last_known_version') !== DEPLOY_VERSION) {
+                console.warn('New version detected! Purging all caches...');
+
+                try {
+                    // 3. Unregister all Service Workers
+                    if (navigator.serviceWorker) {
+                        const regs = await navigator.serviceWorker.getRegistrations();
+                        for (let r of regs) {
+                            await r.unregister();
+                            console.log('Unregistered SW:', r.scope);
+                        }
                     }
-                }
-                if ('caches' in window) {
-                    const keys = await caches.keys();
-                    for (let key of keys) {
-                        await caches.delete(key);
-                        console.log('Cache cleared:', key);
+
+                    // 4. Delete all named caches
+                    if (window.caches) {
+                        const keys = await caches.keys();
+                        for (let k of keys) {
+                            await caches.delete(k);
+                            console.log('Deleted Cache:', k);
+                        }
                     }
+
+                    // 5. Success Marker
+                    localStorage.setItem('last_known_version', DEPLOY_VERSION);
+
+                    // 6. Hard Refresh with Bypass
+                    console.error('CRITICAL: Purge complete. Hard reloading now.');
+                    window.location.reload(true);
+                } catch (err) {
+                    console.error('Purge failed:', err);
                 }
-            } catch (e) {
-                console.warn('Cache clearing failed:', e);
             }
         }
-        // Run immediately and also on a delay to catch late-load SWs
-        clearEverything();
-        setTimeout(clearEverything, 2000);
+
+        // Run immediately
+        forceUpdate();
+        // Also run on a delay in case of late-registering PWA components
+        setTimeout(forceUpdate, 1500);
     </script>
     <div class="app-container">
         <!-- Global Header -->
@@ -424,8 +446,9 @@
     <div id="load-modal" class="picker-modal" style="display: none; z-index: 2000;">
         <div class="picker-content" style="height: 60%; max-height: 500px;">
             <div class="picker-header">
-                <span id="load-cancel" style="color: #999; cursor: pointer;">关闭</span>
-                <span class="picker-title">选择存档</span>
+                <button id="load-cancel"
+                    style="color: #bbb; background: #444; border: none; padding: 4px 12px; border-radius: 4px; font-size: 14px; cursor: pointer;">关闭</button>
+                <span class="picker-title" style="margin-left: -40px;">选择存档</span>
                 <span style="width: 30px;"></span>
             </div>
             <div id="record-list" style="flex: 1; overflow-y: auto; text-align: left; padding: 10px;">
@@ -517,7 +540,7 @@
     <!-- Nuclear Cache Clearing Fix (Force Browser Refresh) -->
     <script>
         (function () {
-            const VERSION = '20240304-v2';
+            const VERSION = '20260305-v1';
             if (localStorage.getItem('app_version') !== VERSION) {
                 console.log('New version detected. Clearing caches and service workers...');
                 if ('serviceWorker' in navigator) {
@@ -541,36 +564,36 @@
         })();
     </script>
 
-    <script src="js/lunar.js?v=20240304-v2"></script>
-    <script src="js/analysis_engine.js?v=20240304-v2"></script>
-    <script src="js/bazi_core.js?v=20240304-v2"></script>
-    <script src="js/yongxiji.v2.js?v=20240304-v2"></script>
-    <script src="js/bazi_logic.js?v=20240304-v2"></script>
-    <script src="js/bazi_narrative.js?v=20240304-v2"></script>
-    <script src="js/life_death_logic.js?v=20240304-v2"></script>
-    <script src="js/decision_engine.js?v=20240304-v2"></script>
-    <script src="js/rules/wealth_tree.js?v=20240304-v2"></script>
-    <script src="js/rules/marriage_tree.js?v=20240304-v2"></script>
-    <script src="js/rules/academic_tree.js?v=20240304-v2"></script>
-    <script src="js/rules/career_tree.js?v=20240304-v2"></script>
-    <script src="js/rules/sexlife_tree.js?v=20240304-v2"></script>
-    <script src="js/rules/children_tree.js?v=20240304-v2"></script>
-    <script src="js/rules/legal_tree.js?v=20240304-v2"></script>
-    <script src="js/ui_render_global.js?v=20240304-v2"></script>
-    <script src="js/pattern_engine.js?v=20240304-v2"></script>
-    <script src="js/pattern_extractor.js?v=20240304-v2"></script>
-    <script src="js/formulas/wealth_patterns.js?v=20240304-v2"></script>
-    <script src="js/formulas/academic_patterns.js?v=20240304-v2"></script>
-    <script src="js/formulas/marriage_patterns.js?v=20240304-v2"></script>
-    <script src="js/formulas/career_patterns.js?v=20240304-v2"></script>
-    <script src="js/formulas/sex_life_patterns.js?v=20240304-v2"></script>
-    <script src="js/formulas/children_patterns.js?v=20240304-v2"></script>
-    <script src="js/formulas/legal_patterns.js?v=20240304-v2"></script>
-    <script src="js/tree_data_static.js?v=20240304-v2"></script>
-    <script src="js/rules/personality_tree.js?v=20240304-v2"></script>
-    <script src="js/rules/attitude_tree.js?v=20240304-v2"></script>
-    <script src="js/rules/strength_logic.js?v=20240304-v2"></script>
-    <script src="js/tree_viewer.js?v=20240304-v2"></script>
+    <script src="js/lunar.js?v=20260305-v1"></script>
+    <script src="js/analysis_engine.js?v=20260305-v1"></script>
+    <script src="js/bazi_core.js?v=20260305-v1"></script>
+    <script src="js/yongxiji.v2.js?v=20260305-v1"></script>
+    <script src="js/bazi_logic.js?v=20260305-v1"></script>
+    <script src="js/bazi_narrative.js?v=20260305-v1"></script>
+    <script src="js/life_death_logic.js?v=20260305-v1"></script>
+    <script src="js/decision_engine.js?v=20260305-v1"></script>
+    <script src="js/rules/wealth_tree.js?v=20260305-v1"></script>
+    <script src="js/rules/marriage_tree.js?v=20260305-v1"></script>
+    <script src="js/rules/academic_tree.js?v=20260305-v1"></script>
+    <script src="js/rules/career_tree.js?v=20260305-v1"></script>
+    <script src="js/rules/sexlife_tree.js?v=20260305-v1"></script>
+    <script src="js/rules/children_tree.js?v=20260305-v1"></script>
+    <script src="js/rules/legal_tree.js?v=20260305-v1"></script>
+    <script src="js/ui_render_global.js?v=20260305-v1"></script>
+    <script src="js/pattern_engine.js?v=20260305-v1"></script>
+    <script src="js/pattern_extractor.js?v=20260305-v1"></script>
+    <script src="js/formulas/wealth_patterns.js?v=20260305-v1"></script>
+    <script src="js/formulas/academic_patterns.js?v=20260305-v1"></script>
+    <script src="js/formulas/marriage_patterns.js?v=20260305-v1"></script>
+    <script src="js/formulas/career_patterns.js?v=20260305-v1"></script>
+    <script src="js/formulas/sex_life_patterns.js?v=20260305-v1"></script>
+    <script src="js/formulas/children_patterns.js?v=20260305-v1"></script>
+    <script src="js/formulas/legal_patterns.js?v=20260305-v1"></script>
+    <script src="js/tree_data_static.js?v=20260305-v1"></script>
+    <script src="js/rules/personality_tree.js?v=20260305-v1"></script>
+    <script src="js/rules/attitude_tree.js?v=20260305-v1"></script>
+    <script src="js/rules/strength_logic.js?v=20260305-v1"></script>
+    <script src="js/tree_viewer.js?v=20260305-v1"></script>
 </body>
 
 </html>
