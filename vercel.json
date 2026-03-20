@@ -4,16 +4,17 @@
     "rewrites": [
         {
             "source": "/",
-            "destination": "/paipan.html"
+            "destination": "/index.html"
         },
         {
             "source": "/paipan",
-            "destination": "/paipan.html"
+            "destination": "/index.html"
         },
         {
             "source": "/sanbanfu2",
-            "destination": "/paipan.html"
+            "destination": "/index.html"
         }
     ],
+
     "cleanUrls": true
 }
