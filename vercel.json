@@ -13,8 +13,17 @@
         {
             "source": "/sanbanfu2",
             "destination": "/index.html"
+        },
+        {
+            "source": "/sanbanfu2/",
+            "destination": "/index.html"
+        },
+        {
+            "source": "/sanbanfu2/(.*)",
+            "destination": "/index.html"
         }
     ],
+
 
     "cleanUrls": true
 }
